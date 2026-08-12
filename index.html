@@ -978,21 +978,38 @@ window.onclick = function(event) {
      Chat on WhatsApp
   </a>
 </div>
-
-<script>
-  // Example: dynamically insert product name into WhatsApp link
-  const productName = document.querySelector('.product-title').innerText; 
-  const whatsappButton = document.getElementById('whatsapp-button');
-  const phoneNumber = "26876123456"; // replace with your business number
-
-  // Pre-fill message with product name
-  const message = `Hi, I want to order ${productName}`;
-  whatsappButton.href = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-</script>
-
         </div>
     </div>
 </div>
-    
+   <script>
+async function handleCheckout(orderPayload) {
+  // Replace with your exact Production Webhook URL from n8n
+  const N8N_WEBHOOK_URL = 'https://samke.app.n8n.cloud/webhook/order-created';
+
+  try {
+    const response = await fetch(N8N_WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        customerName: orderPayload.name,
+        customerPhone: orderPayload.phone ? orderPayload.phone.replace(/[^0-9]/g, '') : '',
+        orderId: orderPayload.id,
+        items: orderPayload.items,
+        total: orderPayload.total
+      })
+    });
+
+    if (response.ok) {
+      alert('Order placed successfully! You will receive a WhatsApp confirmation shortly.');
+    } else {
+      alert('Order placed, but notification sending failed.');
+    }
+ } catch (error) {
+      console.error('Error sending order to n8n:', error);
+    }
+  }
+</script> 
 </body>
 </html>
